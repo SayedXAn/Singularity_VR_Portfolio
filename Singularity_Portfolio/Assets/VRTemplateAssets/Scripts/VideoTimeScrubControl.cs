@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
-using static Unity.Burst.Intrinsics.X86.Sse4_2;
 
 namespace Unity.VRTemplate
 {
@@ -47,7 +46,7 @@ namespace Unity.VRTemplate
         bool m_VideoJumpPending;
         long m_LastFrameBeforeScrub;
         VideoPlayer m_VideoPlayer;
-
+        public Image thumbnail;
         void Start()
         {
             m_VideoPlayer = GetComponent<VideoPlayer>();
@@ -64,6 +63,44 @@ namespace Unity.VRTemplate
 
             if (m_ButtonPlayOrPause != null)
                 m_ButtonPlayOrPause.SetActive(false);
+
+            StartCoroutine(LoadThumbnail());
+
+        }
+
+        private IEnumerator LoadThumbnail()
+        {
+            // Prepare the video (loads the first frame)
+            m_VideoPlayer.Prepare();
+
+            // Wait until the video is prepared
+            while (!m_VideoPlayer.isPrepared)
+                yield return null;
+
+            // Play for a single frame
+            m_VideoPlayer.Play();
+            m_VideoPlayer.Pause();
+
+            yield return new WaitForEndOfFrame();
+
+            // Get the RenderTexture
+            RenderTexture renderTexture = m_VideoPlayer.targetTexture;
+
+            // Copy RenderTexture to Texture2D
+            Texture2D tex = new Texture2D(renderTexture.width, renderTexture.height, TextureFormat.RGB24, false);
+            RenderTexture.active = renderTexture;
+            tex.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
+            tex.Apply();
+            RenderTexture.active = null;
+
+            // Convert Texture2D to Sprite
+            Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+
+            // Assign to UI Image
+            thumbnail.sprite = sprite;
+
+            // Optional: Stop the video completely
+            m_VideoPlayer.Stop();
         }
 
         void OnEnable()
@@ -174,17 +211,19 @@ namespace Unity.VRTemplate
             }
         }
 
-        void VideoStop()
+        public void VideoStop()
         {
             m_VideoIsPlaying = false;
             m_VideoPlayer.Pause();
             m_ButtonPlayOrPauseIcon.sprite = m_IconPlay;
             m_ButtonPlayOrPause.SetActive(true);
+            thumbnail.gameObject.SetActive(true);
         }
 
-        void VideoPlay()
+        public void VideoPlay()
         {
             m_VideoIsPlaying = true;
+            thumbnail.gameObject.SetActive(false);            
             m_VideoPlayer.Play();
             m_ButtonPlayOrPauseIcon.sprite = m_IconPause;
             m_ButtonPlayOrPause.SetActive(false);

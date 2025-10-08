@@ -1,3 +1,4 @@
+using Unity.VRTemplate;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -6,14 +7,7 @@ public class VideoPlayersManager : MonoBehaviour
 {
     public VideoPlayer[] playerList;
 
-    void Start()
-    {
-        for(int i = 0; i < playerList.Length; i++)
-        {
-            playerList[i].Stop();
-            //playerList[i].targetTexture.Release();
-        }
-    }
+
 
 
     public void TurnOffVideoPlayers(int id)
@@ -26,8 +20,7 @@ public class VideoPlayersManager : MonoBehaviour
                 Debug.Log("id " + id);
                 continue;
             }
-            playerList[i].Stop();
-            playerList[i].targetTexture.Release();
+            playerList[i].GetComponent<VideoTimeScrubControl>().VideoStop();
         }
     }
 }
