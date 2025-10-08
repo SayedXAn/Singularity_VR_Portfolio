@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using static Unity.Burst.Intrinsics.X86.Sse4_2;
 
 namespace Unity.VRTemplate
 {

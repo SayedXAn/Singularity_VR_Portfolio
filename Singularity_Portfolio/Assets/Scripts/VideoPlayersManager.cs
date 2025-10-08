@@ -11,22 +11,19 @@ public class VideoPlayersManager : MonoBehaviour
         for(int i = 0; i < playerList.Length; i++)
         {
             playerList[i].Stop();
-            playerList[i].targetTexture.Release();
+            //playerList[i].targetTexture.Release();
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void TurnOffVideoPlayers(int id)
     {
+        Debug.Log("Dhukse??");
         for (int i = 0; i < playerList.Length; i++)
         {
             if(i == id)
             {
+                Debug.Log("id " + id);
                 continue;
             }
             playerList[i].Stop();
