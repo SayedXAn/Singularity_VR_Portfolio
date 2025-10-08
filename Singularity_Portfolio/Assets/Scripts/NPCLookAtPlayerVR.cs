@@ -1,13 +1,18 @@
 using UnityEngine;
 using System.Collections;
+using TMPro;
 
 public class NPCLookAtPlayerVR : MonoBehaviour
 {
     [SerializeField] private float rotationSpeed = 5f;
 
+    [SerializeField] private GameObject dialogueCanvas;
+
     private Transform playerCameraTransform;
     private bool isPlayerInside = false;
     private Coroutine lookAtCoroutine;
+
+    [SerializeField] private UIScroller uiScroller;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -21,6 +26,14 @@ public class NPCLookAtPlayerVR : MonoBehaviour
                 StopCoroutine(lookAtCoroutine);
             }
             lookAtCoroutine = StartCoroutine(RotateTowardsPlayer());
+
+            if (uiScroller != null)
+            {
+                // First, make the canvas visible.
+                uiScroller.gameObject.SetActive(true);
+                // Then, tell the script to start scrolling.
+                uiScroller.StartScrolling();
+            }
         }
     }
 
@@ -29,6 +42,14 @@ public class NPCLookAtPlayerVR : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInside = false;
+
+            if (uiScroller != null)
+            {
+                // Tell the script to stop scrolling.
+                uiScroller.StopScrolling();
+                // Then, hide the canvas.
+                uiScroller.gameObject.SetActive(false);
+            }
         }
     }
 
